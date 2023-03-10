@@ -1,0 +1,8 @@
+# If enabled, some nodes will undergo metamorphosis when adjacent to pumwater.
+wc_vulcan.metamorphic (Vulcanization) bool true
+
+# If enabled, hydrothermal vents will generate underwater. Looks great with 'wc_steam'.
+wc_vulcan.hydrothermal (Hydrothermal Vents) bool true
+
+ #If enabled, pumice becomes mineable rather than vanishing when dug. Disabled by default.
+wc_vulcan.pummine (Mineable Pumice) bool false
