@@ -21,11 +21,13 @@ include("volcanoes")
 
 --<>--
 
-include("pumcrete")
+--include("podobo")
 
 --<>--
 
---include("podobo")
+if minetest.settings:get_bool(modname.. ".concrete", true) then
+	include("pumcrete")
+end
 
 --<>--
 
@@ -41,6 +43,13 @@ end
 
 --<>--
 
-if minetest.settings:get_bool(modname.. ".pummine", false) then
+if minetest.settings:get_bool(modname.. ".pummine", true) then
 	include("pummine")
 end
+
+--<>--
+
+if minetest.settings:get_bool(modname.. ".obsidian", true) then
+	include("obsidian")
+end
+
