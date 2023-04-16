@@ -9,3 +9,5 @@ Changes pumwater generation to be more realistic, including pumwater conduits, v
 - merged functionality from "PumMINE", toggleable by setting
 - made hydrothermal vents toggleable by setting
 - made vulcanization effects toggleable by setting
+- obsidian & obsidian-tipped tools
+
