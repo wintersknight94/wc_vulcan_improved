@@ -53,7 +53,11 @@ local c_lava = minetest.get_content_id("nc_terrain:lava_source") -- https://gith
 local c_water = minetest.get_content_id("nc_terrain:water_source")
 
 local c_lining = minetest.get_content_id("nc_terrain:hard_stone_4")
---local c_hot_lining = minetest.get_content_id(modname .. ":basalt")
+
+if minetest.settings:get_bool(modname.. ".concrete", true) then
+	local c_hot_lining = minetest.get_content_id(modname.. ":pumcrete")
+	else local c_hot_lining = minetest.get_content_id("nc_terrain:hard_stone_3")
+end
 
 local c_cone = minetest.get_content_id("nc_terrain:stone")
 --if minetest.get_mapgen_setting("mg_name") == "v7" then
@@ -62,10 +66,15 @@ local c_cone = minetest.get_content_id("nc_terrain:stone")
 --	c_cone = minetest.get_content_id("nc_terrain:stone")
 --end
 
-local c_ash = minetest.get_content_id("nc_fire:ash")
+local c_ash = minetest.get_content_id("nc_igneous:pumice")
 local c_coalash = minetest.get_content_id("nc_fire:coal1")
 local c_soil = minetest.get_content_id("nc_terrain:dirt")
-local c_igneous = minetest.get_content_id("nc_igneous:pumice")
+
+if minetest.settings:get_bool(modname.. ".concrete", true) then
+	local c_igneous = minetest.get_content_id(modname.. ":pumcrete")
+	else c_igneous = minetest.get_content_id("nc_igneous:pumice")
+end
+
 local c_sand = minetest.get_content_id("nc_terrain:sand")
 local c_underwater_soil = c_sand
 local c_plug = minetest.get_content_id("nc_terrain:hard_stone_4")

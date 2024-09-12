@@ -9,6 +9,12 @@ minetest.register_alias_force("mapgen_lava_source", "air")
 
 --<>--
 
+if minetest.settings:get_bool(modname.. ".concrete", true) then
+	include("pumcrete")
+end
+
+--<>--
+
 include("voxelarea_iterator")
 
 --<>--
@@ -22,12 +28,6 @@ include("volcanoes")
 --<>--
 
 --include("podobo")
-
---<>--
-
-if minetest.settings:get_bool(modname.. ".concrete", true) then
-	include("pumcrete")
-end
 
 --<>--
 
