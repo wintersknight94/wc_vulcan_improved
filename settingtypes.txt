@@ -12,5 +12,3 @@ wc_vulcan.concrete (Volcanic Concrete) bool true
 
 # If enabled, pumice becomes mineable rather than vanishing when dug. Disabled by default.
 wc_vulcan.pummine (Mineable Pumice) bool false
-
-

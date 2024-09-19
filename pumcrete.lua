@@ -76,13 +76,6 @@ minetest.override_item("nc_stonework:bricks_pumcrete_bonded",
 --)
 
 -- ================================================================== --
-minetest.override_item("nc_igneous:pumice",{
-	groups = {
-		snappy = 2,
-		cracky = 2,
-		pumice = 1,
-		stack_as_node = 1
-	}
-})
+
 -- ================================================================== --
 
