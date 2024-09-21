@@ -76,7 +76,8 @@ nodecore.register_abm({
 --Vulcanize Silica--
 nodecore.register_abm({
 		label = "Vulcanize Silica",
-		nodenames = {"group:silica"},
+--		nodenames = {"group:silica"},
+		nodenames = {"nc_optics:glass_crude"},
 		neighbors = {"nc_terrain:lava_source", "nc_terrain:lava_flowing"},
 		neighbors_invert = true,
 		interval = 600,	-- had to extend this or else making float glass was impossible. Even still, dont leave your float glass too long.
