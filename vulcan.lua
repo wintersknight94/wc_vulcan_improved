@@ -80,8 +80,8 @@ nodecore.register_abm({
 		nodenames = {"nc_optics:glass_crude"},
 		neighbors = {"nc_terrain:lava_source", "nc_terrain:lava_flowing"},
 		neighbors_invert = true,
-		interval = 600,	-- had to extend this or else making float glass was impossible. Even still, dont leave your float glass too long.
-		chance = 100,
+		interval = 20, --600,	-- had to extend this or else making float glass was impossible. Even still, dont leave your float glass too long.
+		chance = 10, --100,
 		action = function(pos)
 			nodecore.set_loud(pos, {name = "nc_concrete:cloudstone"})
 		end
