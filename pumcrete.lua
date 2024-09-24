@@ -10,7 +10,7 @@ local pumcrete = pumice.. "^[colorize:black:80"
 local pummix = pumice.. "^(nc_fire_ash.png^[mask:nc_concrete_mask.png)"
 -- ================================================================== --
 minetest.register_node(modname .. ":pumcrete", {
-	description = "Pumcrete",
+	description = "Scoria",
 	tiles = {pumcrete},
 	groups = {
 		cracky = 2,

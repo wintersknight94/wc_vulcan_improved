@@ -10,5 +10,13 @@ wc_vulcan.obsidian (Obsidian) bool true
 # If enabled, adds pumcrete, a new type of concrete made from volcanic aggregate.
 wc_vulcan.concrete (Volcanic Concrete) bool true
 
+# If enabled, pumwater conduits are lined with warm stone, which softly glows and radiates heat.
+# Warm stone can be dug into cobble like normal, but cannot be carved into bricks or touched with silk.
+wc_vulcan.warmstone (Warm Stone) bool true
+
 # If enabled, pumice becomes mineable rather than vanishing when dug. Disabled by default.
 wc_vulcan.pummine (Mineable Pumice) bool false
+
+# Experimental Feature - Use At Own Risk!
+# If enabled, volcanoes will occasionally experience different types of eruptions. Disabled by default.
+wc_vulcan.eruptions (Volcanic Eruptions) bool false

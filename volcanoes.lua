@@ -1,40 +1,33 @@
--- NOTE: This code contains some hacks to work around a number of bugs in mapgen v7 and in Minetest's core mapgen code.
--- The issue URLs for those bugs are included in comments wherever those hacks are used, if the issues get resolved 
--- then the associated hacks should be removed.
--- https://github.com/minetest/minetest/issues/7878
--- https://github.com/minetest/minetest/issues/7864
 -- LUALOCALS < ---------------------------------------------------------
 local minetest, nodecore, math
     = minetest, nodecore, math
 -- LUALOCALS > ---------------------------------------------------------
 local modname = minetest.get_current_modname()
-
-local modpath = minetest.get_modpath(minetest.get_current_modname())
---dofile(modpath .. "/volcano_lava.lua") -- https://github.com/minetest/minetest/issues/7864, https://github.com/minetest/minetest/issues/7878
-
+local modpath = minetest.get_modpath(modname)
+------------------------------------------------------------------------
 local depth_root = -720
-local depth_base = -40		-- point where the mountain root starts expanding
-local depth_maxwidth = -10	-- point of maximum width
+local depth_base = -80		-- point where the mountain root starts expanding
+local depth_maxwidth = -64	-- point of maximum width
 
-local radius_vent = 1		-- approximate minimum radius of vent - noise adds a lot to this
-local radius_lining = 3		-- the difference between this and the vent radius is about how thick the layer of lining nodes is, though noise will affect it
-local caldera_min = 2		-- minimum radius of caldera
+local radius_vent = 2		-- approximate minimum radius of vent - noise adds a lot to this
+local radius_lining = 5		-- the difference between this and the vent radius is about how thick the layer of lining nodes is, though noise will affect it
+local caldera_min = 4		-- minimum radius of caldera
 local caldera_max = 32		-- maximum radius of caldera
 
-local carbon_line = 60		-- above this elevation carbon is added to the stone
-local carbon_border = 20		-- transitional zone where there's scorched soil
+local scorch_line = 80		-- above this elevation ash is added to the soil
+local scorch_border = 32	-- transitional zone where there's scorched soil
 
-local depth_maxpeak = 120
-local depth_minpeak = 20
-local slope_min = 0.75
-local slope_max = 1.5
+local depth_maxpeak = 160
+local depth_minpeak = 32
+local slope_min = 0.45
+local slope_max = 1.75
 
 local region_mapblocks = 16
 local mapgen_chunksize = tonumber(minetest.get_mapgen_setting("chunksize"))
 local volcano_region_size = region_mapblocks * mapgen_chunksize * 16
 
 local magma_chambers_enabled = true
-local chamber_radius_multiplier = 0.5
+local chamber_radius_multiplier = 0.4
 
 local p_active = 0.3
 local p_dormant = 0.3
@@ -49,35 +42,35 @@ local state_extinct = 1 - p_active - p_dormant
 local state_none = 1 - p_active - p_dormant - p_extinct
 
 local c_air = minetest.get_content_id("air")
-local c_lava = minetest.get_content_id("nc_terrain:lava_source") -- https://github.com/minetest/minetest/issues/7864
+local c_lava = minetest.get_content_id("nc_terrain:lava_source")
 local c_water = minetest.get_content_id("nc_terrain:water_source")
 
 local c_lining = minetest.get_content_id("nc_terrain:hard_stone_4")
-
-if minetest.settings:get_bool(modname.. ".concrete", true) then
-	local c_hot_lining = minetest.get_content_id(modname.. ":pumcrete")
-	else local c_hot_lining = minetest.get_content_id("nc_terrain:hard_stone_3")
-end
+local c_hot_lining = minetest.get_content_id("nc_terrain:hard_stone_3")
 
 local c_cone = minetest.get_content_id("nc_terrain:stone")
---if minetest.get_mapgen_setting("mg_name") == "v7" then
---	c_cone = minetest.get_content_id("nc_vulcan:stone") -- https://github.com/minetest/minetest/issues/7878
---else
---	c_cone = minetest.get_content_id("nc_terrain:stone")
---end
+local c_plug = minetest.get_content_id("nc_igneous:pumice")
 
-local c_ash = minetest.get_content_id("nc_igneous:pumice")
-local c_coalash = minetest.get_content_id("nc_fire:coal1")
-local c_soil = minetest.get_content_id("nc_terrain:dirt")
-
-if minetest.settings:get_bool(modname.. ".concrete", true) then
-	local c_igneous = minetest.get_content_id(modname.. ":pumcrete")
-	else c_igneous = minetest.get_content_id("nc_igneous:pumice")
-end
-
+local c_ash = minetest.get_content_id("nc_fire:ash")
+local c_pumash = minetest.get_content_id("nc_concrete:pumpowder")
+local c_carbon = minetest.get_content_id("nc_concrete:coalstone")
+local c_gravel = minetest.get_content_id("nc_terrain:gravel")
+local c_igneous = minetest.get_content_id("nc_igneous:pumice")
 local c_sand = minetest.get_content_id("nc_terrain:sand")
+local c_soil = minetest.get_content_id("nc_terrain:dirt")
 local c_underwater_soil = c_sand
-local c_plug = minetest.get_content_id("nc_terrain:hard_stone_4")
+
+if minetest.settings:get_bool(modname.. ".obsidian", true) then
+	c_lining = minetest.get_content_id(modname.. ":obsidian")
+	c_underwater_soil = minetest.get_content_id(modname.. ":obsidian")
+end
+if minetest.settings:get_bool(modname.. ".warmstone", true) then
+	c_hot_lining = minetest.get_content_id(modname.. ":stone_hot")
+end
+if minetest.settings:get_bool(modname.. ".concrete", true) then
+	c_igneous = minetest.get_content_id(modname.. ":pumcrete")
+	c_plug = minetest.get_content_id(modname.. ":pumcrete")
+end
 
 local water_level = tonumber(minetest.get_mapgen_setting("water_level"))
 local mapgen_seed = tonumber(minetest.get_mapgen_setting("seed"))
@@ -198,13 +191,13 @@ minetest.register_on_generated(function(minp, maxp, seed)
 			if desc.node_top ~= nil and desc.node_top ~= "" then
 				biome_data.c_top = minetest.get_content_id(desc.node_top)
 				if biome_data.c_top == c_sand then
-					biome_data.c_top = c_ash -- beach sand just doesn't look nice on the side of a volcano, replace it with ash
+					biome_data.c_top = c_gravel -- beach sand just doesn't look nice on the side of a volcano, replace it with ash
 				end
 			end
 			if desc.node_filler ~= nil and desc.node_filler ~= "" then
 				biome_data.c_filler = minetest.get_content_id(desc.node_filler)
 				if biome_data.c_filler == c_sand then
-					biome_data.c_filler = c_ash -- beach sand just doesn't look nice on the side of a volcano, replace it with ash
+					biome_data.c_filler = c_gravel -- beach sand just doesn't look nice on the side of a volcano, replace it with ash
 				end
 			end
 			biome_ids[i] = biome_data
@@ -232,40 +225,44 @@ minetest.register_on_generated(function(minp, maxp, seed)
 		local c_top
 		local c_filler
 		local c_dust
-		if state < state_dormant then
+		if state ~= state_active then
 			if y < water_level then
-				c_top = c_underwater_soil
+				c_top = c_igneous
 				c_filler = c_underwater_soil
-			elseif y < carbon_line and biome_data ~= nil then
+			elseif biome_data ~= nil then
 				c_top = biome_data.c_top
 				c_filler = biome_data.c_filler
-				c_dust = c_air
-			elseif y < carbon_line + carbon_border then
-				c_top = c_igneous
-				c_filler = c_coalash
-				c_dust = c_air
+				c_dust = biome_data.c_dust
 			else
-				c_top = c_coalash
+				c_top = c_gravel
 				c_filler = c_igneous
-				c_dust = c_ash
+				c_dust = c_air
 			end
+		elseif y < water_level then
+			c_top = c_igneous
+			c_filler = c_underwater_soil
+		elseif y < scorch_line and biome_data ~= nil then
+			c_top = biome_data.c_top
+			c_filler = biome_data.c_filler
+			c_dust = biome_data.c_dust
 		else
-			c_top = c_ash
+			c_top = c_pumash
 			c_filler = c_igneous
+			c_dust = c_ash
 		end
 		
 		local pipestuff
 		local liningstuff
 		if y < depth_lava + math.random() * 1.1 then
 			pipestuff = c_lava
-			liningstuff = c_lining
+			liningstuff = c_hot_lining
 		else
 			if state < state_dormant then
 				pipestuff = c_plug -- dormant volcano
 				liningstuff = c_lining
 			else
 				pipestuff = c_air -- active volcano
-				liningstuff = c_lining
+				liningstuff = c_hot_lining
 			end
 		end
 
@@ -277,20 +274,20 @@ minetest.register_on_generated(function(minp, maxp, seed)
 				local lower_half = ((y - depth_root) / chamber_radius) * chamber_radius
 				if distance < lower_half + radius_vent then
 					data[vi] = c_lava -- Put lava in the magma chamber even for extinct volcanoes, if someone really wants to dig for it it's down there.
-				elseif distance < lower_half + radius_lining and data[vi] ~= c_air and data[vi] ~= c_lava then -- leave holes into caves and into existing lava
+				elseif distance < lower_half + radius_lining  and data[vi] ~= c_lava then -- leave holes into existing lava
 					data[vi] = liningstuff
 				end
 			elseif magma_chambers_enabled and y < depth_root + chamber_radius * 2 then -- Magma chamber upper half
 				local upper_half = (1 - (y - depth_root - chamber_radius) / chamber_radius) * chamber_radius
 				if distance < upper_half + radius_vent then
 					data[vi] = c_lava
-				elseif distance < upper_half + radius_lining and data[vi] ~= c_air and data[vi] ~= c_lava then -- leave holes into caves and into existing lava
+				elseif distance < upper_half + radius_lining and data[vi] ~= c_lava then -- leave hole existing lava
 					data[vi] = liningstuff
 				end
 			else -- pipe
 				if distance < radius_vent then
 					data[vi] = pipestuff
-				elseif distance < radius_lining and data[vi] ~= c_air and data[vi] ~= c_lava then -- leave holes into caves and into existing lava
+				elseif distance < radius_lining and data[vi] ~= c_lava then -- leave holes into existing lava
 					data[vi] = liningstuff
 				end
 			end
