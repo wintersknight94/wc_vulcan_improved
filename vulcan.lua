@@ -11,7 +11,7 @@ local modname = minetest.get_current_modname()
 --Vulcanize Soil--
 nodecore.register_abm({
 		label = "Vulcanize Soil",
-		nodenames = {"group:soil", "group:clay"},
+		nodenames = {"group:soil"},
 		neighbors = {"nc_terrain:lava_source", "nc_terrain:lava_flowing"},
 		neighbors_invert = true,
 		interval = 20,
@@ -98,6 +98,21 @@ nodecore.register_abm({
 		chance = 10,
 		action = function(pos)
 			nodecore.set_loud(pos, {name = "wc_naturae:shellstone"})
+		end
+	})
+end
+
+if minetest.get_modpath("wc_pottery") then
+--Vulcanize Clay--
+nodecore.register_abm({
+		label = "Vulcanize Clay",
+		nodenames = {"group:clay"},
+		neighbors = {"nc_terrain:lava_source", "nc_terrain:lava_flowing"},
+		neighbors_invert = true,
+		interval = 20,
+		chance = 10,
+		action = function(pos)
+			nodecore.set_loud(pos, {name = "wc_pottery:ceramic"})
 		end
 	})
 end
