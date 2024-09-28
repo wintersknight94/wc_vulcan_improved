@@ -5,7 +5,7 @@ Changes pumwater generation to be more realistic, including pumwater conduits, v
 #Improvements over the my 'nc_vulcan':
 - changed vulcanization nodes to groups
 - added 'pumcrete', ('scoria' if wc_strata installed), a new concrete type!
-- more stone covering around pumwater conduits to reduce abm bogging
+- warmstone covering around pumwater conduits to reduce abm bogging
 - merged functionality from "PumMINE", toggleable by setting
 - made hydrothermal vents toggleable by setting
 - made vulcanization effects toggleable by setting
