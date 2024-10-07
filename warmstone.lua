@@ -12,7 +12,9 @@ minetest.register_node(modname .. ":stone_hot", {
 		stone_hot = 1,
 --		rock = 1,
 --		smoothstone = 1,
-		cracky = 2
+		cracky = 2,
+		damage_touch = 1,
+		damage_radiant = 6,
 	},
 	light_source = 2,
 	glow = 1,
